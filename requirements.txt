@@ -3,3 +3,4 @@ beautifulsoup4>=4.12
 lxml>=5.0
 Scrapy>=2.11
 requests>=2.31
+xhtml2pdf>=0.2.15

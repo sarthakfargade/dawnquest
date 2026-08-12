@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: Helvetica, Arial, sans-serif; font-size: 12px; }
+        h1 { font-size: 18px; text-align: center; margin-bottom: 4px; }
+        .meta { text-align: center; color: #555; margin-bottom: 20px; font-size: 11px; }
+        .question { margin-bottom: 14px; }
+        .q-number { font-weight: bold; }
+        .q-meta { color: #666; font-size: 10px; }
+    </style>
+</head>
+<body>
+    <h1>{{ subject.name }} — Question Paper</h1>
+    <div class="meta">Total Marks: {{ result.total_marks }} &nbsp;|&nbsp; Paper ID (seed): {{ result.seed }}</div>
+
+    {% for q in result.questions %}
+        <div class="question">
+            <span class="q-number">{{ forloop.counter }}.</span> {{ q.text }}
+            <div class="q-meta">[{{ q.marks }} marks | {{ q.get_difficulty_display }} | {{ q.get_q_type_display }}]</div>
+        </div>
+    {% endfor %}
+</body>
+</html>

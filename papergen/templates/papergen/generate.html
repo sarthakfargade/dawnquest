@@ -2,56 +2,436 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>DawnQuest - Generate Question Paper</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>DawnQuest — Generate Question Paper</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 20px; }
-        label { display: block; margin-top: 12px; font-weight: bold; }
-        select, input { padding: 6px; margin-top: 4px; }
-        .question { border-bottom: 1px solid #ddd; padding: 10px 0; }
-        .meta { color: #666; font-size: 0.85em; }
-        button { margin-top: 20px; padding: 10px 20px; }
+        :root {
+            --ink: #1B2A4A;
+            --ink-soft: #3A4A6B;
+            --parchment: #FBF7EF;
+            --parchment-dim: #F2ECDD;
+            --gold: #C69749;
+            --gold-deep: #A97B34;
+            --teal: #2F6F62;
+            --coral: #C0533B;
+            --line: #DDD3BF;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            background: var(--ink);
+            background-image:
+                radial-gradient(circle at 10% 0%, rgba(198,151,73,0.14), transparent 35%),
+                radial-gradient(circle at 90% 100%, rgba(198,151,73,0.08), transparent 40%);
+            min-height: 100vh;
+            font-family: 'IBM Plex Sans', sans-serif;
+            color: var(--ink);
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 28px 24px 0;
+        }
+
+        .wordmark {
+            font-family: 'Fraunces', serif;
+            font-weight: 700;
+            font-size: 20px;
+            color: var(--parchment);
+            letter-spacing: 0.01em;
+        }
+        .wordmark span { color: var(--gold); }
+
+        .who {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            color: rgba(251,247,239,0.7);
+        }
+
+        .who form { display: inline; }
+
+        .who button {
+            background: none;
+            border: none;
+            color: var(--gold);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            cursor: pointer;
+            padding: 0;
+            text-decoration: underline;
+        }
+
+        .hero {
+            max-width: 760px;
+            margin: 34px auto 8px;
+            padding: 0 24px;
+        }
+
+        .eyebrow {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin: 0 0 8px;
+        }
+
+        .hero h1 {
+            font-family: 'Fraunces', serif;
+            font-weight: 600;
+            font-size: 32px;
+            color: var(--parchment);
+            margin: 0 0 8px;
+            line-height: 1.15;
+        }
+
+        .hero p {
+            color: rgba(251,247,239,0.65);
+            font-size: 14px;
+            margin: 0 0 30px;
+            max-width: 480px;
+        }
+
+        .card {
+            max-width: 760px;
+            margin: 0 auto 40px;
+            background: var(--parchment);
+            border-radius: 4px;
+            padding: 32px 36px;
+            box-shadow: 0 24px 50px rgba(0,0,0,0.3);
+        }
+
+        .field-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: #6b5f4f;
+            margin-top: 20px;
+            margin-bottom: 7px;
+        }
+
+        select, input[type="number"] {
+            width: 100%;
+            padding: 10px 11px;
+            border: 1px solid var(--line);
+            border-radius: 3px;
+            background: #fff;
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-size: 14px;
+            color: var(--ink);
+        }
+
+        select:focus, input:focus {
+            outline: 2px solid var(--gold);
+            outline-offset: 1px;
+            border-color: var(--gold);
+        }
+
+        select[multiple] { padding: 6px; }
+        select[multiple] option { padding: 6px 8px; }
+
+        .mix-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 14px;
+        }
+
+        .mix-item {
+            border: 1px solid var(--line);
+            border-radius: 3px;
+            padding: 8px 10px;
+            background: #fff;
+        }
+
+        .mix-item .tag {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .mix-item.easy .tag { color: var(--teal); }
+        .mix-item.medium .tag { color: var(--gold-deep); }
+        .mix-item.hard .tag { color: var(--coral); }
+
+        .mix-item input {
+            border: none;
+            padding: 2px 0 0;
+            font-size: 20px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
+            width: 100%;
+        }
+        .mix-item input:focus { outline: none; }
+
+        .generate-btn {
+            width: 100%;
+            margin-top: 30px;
+            padding: 15px;
+            background: var(--ink);
+            color: var(--parchment);
+            border: none;
+            border-radius: 3px;
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            letter-spacing: 0.02em;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+        .generate-btn:hover { background: #0f1c33; }
+
+        /* ---- Result: exam-ticket stub ---- */
+        .stub-wrap {
+            max-width: 760px;
+            margin: 0 auto 60px;
+            position: relative;
+        }
+
+        .stub {
+            background: #fff;
+            border-radius: 4px;
+            box-shadow: 0 24px 50px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .stub-head {
+            background: var(--ink);
+            color: var(--parchment);
+            padding: 22px 36px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        .stub-head h2 {
+            font-family: 'Fraunces', serif;
+            font-weight: 600;
+            font-size: 20px;
+            margin: 0;
+        }
+
+        .seed-stamp {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            border: 1.5px solid var(--gold);
+            color: var(--gold);
+            padding: 6px 12px;
+            border-radius: 3px;
+            transform: rotate(-3deg);
+            letter-spacing: 0.04em;
+            white-space: nowrap;
+        }
+
+        .perforation {
+            height: 0;
+            border-top: 2px dashed var(--line);
+            position: relative;
+            margin: 0 36px;
+        }
+        .perforation::before, .perforation::after {
+            content: "";
+            position: absolute;
+            top: -10px;
+            width: 20px;
+            height: 20px;
+            background: var(--ink);
+            border-radius: 50%;
+        }
+        .perforation::before { left: -46px; }
+        .perforation::after { right: -46px; }
+
+        .stub-body {
+            padding: 8px 36px 30px;
+        }
+
+        .q-item {
+            padding: 18px 0;
+            border-bottom: 1px solid var(--parchment-dim);
+        }
+        .q-item:last-child { border-bottom: none; }
+
+        .q-num {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            color: var(--gold-deep);
+            font-weight: 600;
+        }
+
+        .q-text {
+            font-size: 15px;
+            margin: 4px 0 8px;
+            line-height: 1.5;
+        }
+
+        .q-tags { display: flex; gap: 8px; }
+
+        .tag-pill {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            padding: 3px 9px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        .tag-pill.easy { background: rgba(47,111,98,0.12); color: var(--teal); }
+        .tag-pill.medium { background: rgba(198,151,73,0.15); color: var(--gold-deep); }
+        .tag-pill.hard { background: rgba(192,83,59,0.12); color: var(--coral); }
+        .tag-pill.type { background: var(--parchment-dim); color: #6b5f4f; }
+
+        .empty-msg {
+            padding: 30px 0;
+            color: #8a7d68;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .pdf-btn {
+            display: block;
+            width: 100%;
+            margin-top: 8px;
+            padding: 13px;
+            background: var(--gold);
+            color: var(--ink);
+            border: none;
+            border-radius: 3px;
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+        .pdf-btn:hover { background: var(--gold-deep); color: var(--parchment); }
+
+        @media (max-width: 620px) {
+            .field-row, .mix-row { grid-template-columns: 1fr; }
+            .card, .stub-body, .stub-head { padding-left: 22px; padding-right: 22px; }
+            .perforation { margin: 0 22px; }
+        }
     </style>
 </head>
 <body>
-    <h1>DawnQuest — Generate Question Paper</h1>
+    <div class="topbar">
+        <div class="wordmark">Dawn<span>Quest</span></div>
+        <div class="who">
+            {{ request.user.username }} ·
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit">Log out</button>
+            </form>
+        </div>
+    </div>
 
-    <form method="post">
-        {% csrf_token %}
-        <label for="subject">Subject</label>
-        <select name="subject" id="subject" required>
-            {% for s in subjects %}
-                <option value="{{ s.id }}">{{ s.name }}</option>
-            {% endfor %}
-        </select>
+    <div class="hero">
+        <p class="eyebrow">Question Paper Generator</p>
+        <h1>Build a paper in seconds.</h1>
+        <p>Pick a subject, set your marks and difficulty mix, and DawnQuest pulls a randomized paper from the question bank — reproducible any time with its seed.</p>
+    </div>
 
-        <label for="chapters">Chapters (select one or more)</label>
-        <select name="chapters" id="chapters" multiple required size="5">
-            {% for c in chapters %}
-                <option value="{{ c.id }}">{{ c }}</option>
-            {% endfor %}
-        </select>
+    <div class="card">
+        <form method="post">
+            {% csrf_token %}
+            <div class="field-row">
+                <div>
+                    <label for="subject">Subject</label>
+                    <select name="subject" id="subject" required>
+                        {% for s in subjects %}
+                            <option value="{{ s.id }}">{{ s.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label for="total_marks">Total marks</label>
+                    <input type="number" name="total_marks" id="total_marks" value="{{ total_marks }}" min="1">
+                </div>
+            </div>
 
-        <label for="total_marks">Total marks</label>
-        <input type="number" name="total_marks" id="total_marks" value="50" min="1">
+            <label for="chapters">Chapters (select one or more)</label>
+            <select name="chapters" id="chapters" multiple required size="4">
+                {% for c in chapters %}
+                    <option value="{{ c.id }}">{{ c }}</option>
+                {% endfor %}
+            </select>
 
-        <label>Difficulty mix (%)</label>
-        Easy <input type="number" name="easy_pct" value="30" min="0" max="100">
-        Medium <input type="number" name="medium_pct" value="50" min="0" max="100">
-        Hard <input type="number" name="hard_pct" value="20" min="0" max="100">
+            <label>Difficulty mix</label>
+            <div class="mix-row">
+                <div class="mix-item easy">
+                    <div class="tag">Easy %</div>
+                    <input type="number" name="easy_pct" value="30" min="0" max="100">
+                </div>
+                <div class="mix-item medium">
+                    <div class="tag">Medium %</div>
+                    <input type="number" name="medium_pct" value="50" min="0" max="100">
+                </div>
+                <div class="mix-item hard">
+                    <div class="tag">Hard %</div>
+                    <input type="number" name="hard_pct" value="20" min="0" max="100">
+                </div>
+            </div>
 
-        <button type="submit">Generate Paper</button>
-    </form>
+            <button type="submit" class="generate-btn">Generate paper</button>
+        </form>
+    </div>
 
     {% if result %}
-        <h2>Generated Paper (Total: {{ result.total_marks }} marks, seed: {{ result.seed }})</h2>
-        {% for q in result.questions %}
-            <div class="question">
-                <div>{{ forloop.counter }}. {{ q.text }}</div>
-                <div class="meta">[{{ q.marks }} marks | {{ q.difficulty }} | {{ q.get_q_type_display }}]</div>
+    <div class="stub-wrap">
+        <div class="stub">
+            <div class="stub-head">
+                <h2>Generated Paper</h2>
+                <div class="seed-stamp">SEED № {{ result.seed }} · {{ result.total_marks }} MKS</div>
             </div>
-        {% empty %}
-            <p>No questions matched — add more questions to the bank via /admin.</p>
-        {% endfor %}
+            <div class="perforation"></div>
+            <div class="stub-body">
+                {% for q in result.questions %}
+                    <div class="q-item">
+                        <span class="q-num">Q{{ forloop.counter }}</span>
+                        <div class="q-text">{{ q.text }}</div>
+                        <div class="q-tags">
+                            <span class="tag-pill {{ q.difficulty }}">{{ q.difficulty }}</span>
+                            <span class="tag-pill type">{{ q.marks }} marks</span>
+                            <span class="tag-pill type">{{ q.get_q_type_display }}</span>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="empty-msg">No questions matched this selection — add more to the bank via /admin.</div>
+                {% endfor %}
+
+                {% if result.questions %}
+                    <form method="post" action="{% url 'download_paper_pdf' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="subject" value="{{ request.POST.subject }}">
+                        {% for cid in chapter_ids %}
+                            <input type="hidden" name="chapters" value="{{ cid }}">
+                        {% endfor %}
+                        <input type="hidden" name="total_marks" value="{{ total_marks }}">
+                        <input type="hidden" name="easy_pct" value="{{ request.POST.easy_pct }}">
+                        <input type="hidden" name="medium_pct" value="{{ request.POST.medium_pct }}">
+                        <input type="hidden" name="hard_pct" value="{{ request.POST.hard_pct }}">
+                        <input type="hidden" name="seed" value="{{ result.seed }}">
+                        <button type="submit" class="pdf-btn">Download as PDF</button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
     {% endif %}
 </body>
 </html>
