@@ -4,3 +4,7 @@ lxml>=5.0
 Scrapy>=2.11
 requests>=2.31
 xhtml2pdf>=0.2.15
+gunicorn>=21.2
+whitenoise>=6.6
+dj-database-url>=2.1
+psycopg2-binary>=2.9
